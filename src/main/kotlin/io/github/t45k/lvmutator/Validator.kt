@@ -24,7 +24,13 @@ class Validator {
                     variance[calc(fileA, fileB)]++
                 }
             }
+        println("Recall")
         (1..20).forEach { println("$it ${variance[it]}") }
+
+        println("\nOverlooked")
+        alreadyValidatedClonePair
+            .map { "${(it + 19) / 20} $it" }
+            .forEach { println(it) }
     }
 
     private fun calc(base: String, mutant: String): Int {

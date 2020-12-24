@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.dom.IfStatement
 import org.eclipse.jdt.core.dom.LabeledStatement
 import org.eclipse.jdt.core.dom.ReturnStatement
 import org.eclipse.jdt.core.dom.Statement
-import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor
 import org.eclipse.jdt.core.dom.SwitchStatement
 import org.eclipse.jdt.core.dom.SynchronizedStatement
 import org.eclipse.jdt.core.dom.ThrowStatement
@@ -35,6 +34,7 @@ import kotlin.random.Random
 
 
 class Mutator {
+
     private val rand: Random = Random(System.currentTimeMillis())
 
     fun mutate() {
@@ -84,7 +84,12 @@ class Mutator {
                 methodDeclaration.accept(visitor)
                 val target: Statement = visitor.getStatements().shuffled(rand).first { it.parent is Block }
                 val oldBlock: Block = target.parent as Block
-                val beforeOrAfter = if (rand.nextBoolean()) 0 else 1
+                val beforeOrAfter =
+                    if (target is ReturnStatement) { // Inserting statements after Return stmt is not realistic.
+                        0
+                    } else {
+                        if (rand.nextBoolean()) 0 else 1
+                    }
                 val insertedStatement = ASTNode.copySubtree(target.ast, insertion) as Statement
                 oldBlock.statements().add(oldBlock.statements().indexOf(target) + beforeOrAfter, insertedStatement)
                 File("mutantfragment", "${fileIndex++}").writeText(methodDeclaration.toString())
