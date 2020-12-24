@@ -85,7 +85,8 @@ class Mutator {
                 val target: Statement = visitor.getStatements().shuffled(rand).first { it.parent is Block }
                 val oldBlock: Block = target.parent as Block
                 val beforeOrAfter =
-                    if (target is ReturnStatement) { // Inserting statements after Return stmt is not realistic.
+                    // Inserting statements after Return or Throw stmt is not realistic.
+                    if (target is ReturnStatement || target is ThrowStatement) {
                         0
                     } else {
                         if (rand.nextBoolean()) 0 else 1
