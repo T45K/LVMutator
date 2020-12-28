@@ -6,7 +6,8 @@ class Validator {
     private val alreadyValidatedClonePair: MutableSet<Int> = mutableSetOf()
 
     fun validate(resultFileName: String) {
-        val variance = Array(21) { 0 }
+        val size = File("mutantfragment").list().size / File("fragment").list().size
+        val variance = Array(size + 1) { 0 }
         File(resultFileName).readLines()
             .forEach {
                 val elements = it.split(",")
@@ -19,28 +20,28 @@ class Validator {
                 }
 
                 if (fileA.contains("Mutant")) {
-                    variance[calc(fileB, fileA)]++
+                    variance[calc(fileB, fileA, size)]++
                 } else {
-                    variance[calc(fileA, fileB)]++
+                    variance[calc(fileA, fileB, size)]++
                 }
             }
         println("Recall")
-        (1..20).forEach { println("$it ${variance[it]}") }
+        (1..size).forEach { println("$it ${variance[it]}") }
 
         println("\nOverlooked")
         alreadyValidatedClonePair
-            .map { "${(it + 19) / 20} $it" }
+            .map { "${(it + size) / size} $it" }
             .forEach { println(it) }
     }
 
-    private fun calc(base: String, mutant: String): Int {
+    private fun calc(base: String, mutant: String, size: Int = 20): Int {
         val baseNumber = getNumber(base)
         val mutantNumber = getNumber(mutant)
-        return if (mutantNumber > (baseNumber - 1) * 20 && mutantNumber <= baseNumber * 20
+        return if (mutantNumber > (baseNumber - 1) * size && mutantNumber <= baseNumber * size
             && !alreadyValidatedClonePair.contains(mutantNumber)
         ) {
             alreadyValidatedClonePair.add(mutantNumber)
-            mutantNumber - (baseNumber - 1) * 20
+            mutantNumber - (baseNumber - 1) * size
         } else {
             0
         }
