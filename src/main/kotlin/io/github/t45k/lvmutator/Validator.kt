@@ -29,12 +29,13 @@ class Validator {
         (1..size).forEach { println("$it ${variance[it]}") }
 
         println("\nOverlooked")
-        alreadyValidatedClonePair
-            .map { "${(it + size) / size} $it" }
+        (1..File("mutantfragment").list().size)
+            .filterNot { alreadyValidatedClonePair.contains(it) }
+            .map { "${(it + size - 1) / size} $it" }
             .forEach { println(it) }
     }
 
-    private fun calc(base: String, mutant: String, size: Int = 20): Int {
+    private fun calc(base: String, mutant: String, size: Int): Int {
         val baseNumber = getNumber(base)
         val mutantNumber = getNumber(mutant)
         return if (mutantNumber > (baseNumber - 1) * size && mutantNumber <= baseNumber * size
